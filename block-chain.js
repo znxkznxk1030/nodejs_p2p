@@ -1,8 +1,15 @@
 const SHA256 = require('crypto-js/sha256');
 
+class Transaction{
+	constructor(fromAddress, toAddress, amount){
+		this.fromAddress = fromAddress;
+		this.toAddress = toAddress;
+		this.amount = amount;
+	}
+}
+
 class Block{
-	constructor(index, timestamp, data, previousHash = ''){
-		this.index = index;
+	constructor(timestamp, transaction, previousHash = ''){
 		this.timestamp = timestamp;
 		this.data = data;
 		this.previousHash = previousHash;
@@ -18,7 +25,7 @@ class Block{
 		while(this.hash.substring(0, difficulty) !== Array(difficulty + 1).join("0")){
 			this.nonce++;
 			this.hash = this.calculateHash();
-			console.log("hash" + this.hash);
+			console.log("hash : " + this.hash);
 		}
 
 		console.log("Block mined! : " + this.hash);
@@ -29,10 +36,12 @@ class BlockChain{
 	constructor(){
 		this.chain = [this.createGenesisBlock()];
 		this.difficulty = 2;
+		this.pendingTransactions = [];
+		this.miningReward = 100;
 	}
 
 	createGenesisBlock() {
-		return new Block(0, "01/01/2018", "Genesis block", "0");
+		return new Block("01/01/2018", "Genesis block", "0");
 	}
 
 	getLatestBlock(){
@@ -43,6 +52,10 @@ class BlockChain{
 		newBlock.previousHash = this.getLatestBlock().hash;
 		newBlock.mineBlock(this.difficulty);
 		this.chain.push(newBlock);
+	}
+
+	minePendingTransactions(miningRewardAddress){
+	
 	}
 
 	isChainValid(){
@@ -65,12 +78,13 @@ class BlockChain{
 
 }
 
+console.log(1001>111);
+
 let ysCoin = new BlockChain();
 
 ysCoin.addBlock(new Block(1, "10/07/2018", { amount: 4 }));
 ysCoin.addBlock(new Block(2, "30/10/2018", { amount: 6 }));
 
-console.log(JSON.stringify(ysCoin, null, 4));
 
 
 
