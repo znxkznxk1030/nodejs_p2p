@@ -1,36 +1,8 @@
+const Block = require('./block.js');
+const Transaction = require('./transaction.js');
+
 const SHA256 = require('crypto-js/sha256');
 
-class Transaction{
-	constructor(fromAddress, toAddress, amount){
-		this.fromAddress = fromAddress;
-		this.toAddress = toAddress;
-		this.amount = amount;
-	}
-}
-
-class Block{
-	constructor(timestamp, transactions, previousHash = ''){
-		this.timestamp = timestamp;
-		this.previousHash = previousHash;
-		this.transactions = transactions;
-		this.hash = this.calculateHash();
-		this.nonce = 0;
-	}
-
-	calculateHash(){
-		return SHA256(this.index + this.previousHash + this.timestamp + JSON.stringify(this.data) + this.nonce).toString();		
-	}
-
-	mineBlock(difficulty){
-		while(this.hash.substring(0, difficulty) !== Array(difficulty + 1).join("0")){
-			this.nonce++;
-			this.hash = this.calculateHash();
-			//console.log("hash : " + this.hash);
-		}
-
-		console.log("Block mined! : " + this.hash);
-	}
-}
 
 class BlockChain{
 	constructor(){
@@ -118,25 +90,5 @@ class BlockChain{
 
 }
 
-let ysCoin = new BlockChain();
-ysCoin.createTransaction(new Transaction('address1', 'address2', 100));
-
-ysCoin.minePendingTransactions('ys');
-
-console.log('blance of ys is ' + ysCoin.getBalanceOfAddress('ys'));
-
-
-ysCoin.minePendingTransactions('ys');
-
-console.log('blance of ys is ' + ysCoin.getBalanceOfAddress('ys'));
-
-console.log('blance of address2 : ' + ysCoin.getBalanceOfAddress('address2'));
-
-
-ysCoin.showAllTransactions();
-
-console.log(ysCoin.isChainValid());
-
-
-
+module.exports = BlockChain;
 
