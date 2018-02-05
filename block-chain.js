@@ -9,10 +9,10 @@ class Transaction{
 }
 
 class Block{
-	constructor(timestamp, transaction, previousHash = ''){
+	constructor(timestamp, transactions, previousHash = ''){
 		this.timestamp = timestamp;
-		this.data = data;
 		this.previousHash = previousHash;
+		this.transactions = transactions;
 		this.hash = this.calculateHash();
 		this.nonce = 0;
 	}
@@ -25,7 +25,7 @@ class Block{
 		while(this.hash.substring(0, difficulty) !== Array(difficulty + 1).join("0")){
 			this.nonce++;
 			this.hash = this.calculateHash();
-			console.log("hash : " + this.hash);
+			//console.log("hash : " + this.hash);
 		}
 
 		console.log("Block mined! : " + this.hash);
@@ -41,7 +41,7 @@ class BlockChain{
 	}
 
 	createGenesisBlock() {
-		return new Block("01/01/2018", "Genesis block", "0");
+		return new Block("01/01/2018", [new Transaction('genesis', 'genesis', 0)] , "0");
 	}
 
 	getLatestBlock(){
@@ -55,12 +55,42 @@ class BlockChain{
 	}
 
 	minePendingTransactions(miningRewardAddress){
-	
+		let block = new Block(Date.now(), this.pendingTransactions, this.getLatestBlock().hash);
+		block.mineBlock(this.difficulty);
+
+		console.log('block successfully mined!');
+
+		this.chain.push(block);
+
+		this.pendingTransactions = [
+			new Transaction(null, miningRewardAddress, this.miningReward)
+		];
+	}
+
+	createTransaction(transaction){
+		this.pendingTransactions.push(transaction);
+	}
+
+	getBalanceOfAddress(address){
+		let balance = 0;
+
+		for (const block of this.chain) {
+			for (const trans of block.transactions) {
+				if (trans.fromAddress === address) { 
+					balance -= trans.amount;
+				}
+
+				if(trans.toAddress === address) {
+					balance += trans.amount;
+				}
+			}
+		}
+		
+		return balance;
 	}
 
 	isChainValid(){
-
-		for(let i = 1; i < this.length - 1; i++){
+		for(let i = 1; i < this.chain.length - 1; i++){
 			const currentBlock = this.chain[i];
 			const previousBlock = this.chain[i - 1];
 
@@ -76,28 +106,36 @@ class BlockChain{
 		}
 	}
 
+	showAllTransactions(){
+		for (const block of this.chain) {
+
+			console.log('block : ' + block.hash);
+			for(const trans of block.transactions) {
+				console.log(trans);
+			}
+		}
+	}
+
 }
 
-console.log(1001>111);
-
 let ysCoin = new BlockChain();
+ysCoin.createTransaction(new Transaction('address1', 'address2', 100));
 
-ysCoin.addBlock(new Block(1, "10/07/2018", { amount: 4 }));
-ysCoin.addBlock(new Block(2, "30/10/2018", { amount: 6 }));
+ysCoin.minePendingTransactions('ys');
 
-
-
-
+console.log('blance of ys is ' + ysCoin.getBalanceOfAddress('ys'));
 
 
+ysCoin.minePendingTransactions('ys');
+
+console.log('blance of ys is ' + ysCoin.getBalanceOfAddress('ys'));
+
+console.log('blance of address2 : ' + ysCoin.getBalanceOfAddress('address2'));
 
 
+ysCoin.showAllTransactions();
 
-
-
-
-
-
+console.log(ysCoin.isChainValid());
 
 
 
