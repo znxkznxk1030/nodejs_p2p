@@ -1,5 +1,6 @@
 const Block = require('./block.js');
 const Transaction = require('./transaction.js');
+const merkleRoot = require('./utility.js').merkleRoot;
 
 const SHA256 = require('crypto-js/sha256');
 
@@ -79,13 +80,19 @@ class BlockChain{
 	}
 
 	showAllTransactions(){
-		for (const block of this.chain) {
 
+		console.log('-----start tracking transactions-----\n');
+
+
+		for (const block of this.chain) {
 			console.log('block : ' + block.hash);
 			for(const trans of block.transactions) {
-				console.log(trans);
+				merkleRoot(block.transactions);
+				console.log(JSON.stringify(trans));
 			}
 		}
+
+		console.log('\n-----finish tracking transactions-----');
 	}
 
 }
